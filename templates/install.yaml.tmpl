@@ -1,0 +1,27 @@
+machine:
+  install:
+    disk: /dev/sda
+  systemDiskEncryption:
+    ephemeral:
+      provider: luks2
+      keys:
+        - nodeID: {}
+          slot: 0
+    state:
+      provider: luks2
+      keys:
+        - nodeID: {}
+          slot: 0
+  network:
+    hostname: ${hostname}
+    nameservers:
+      - ${dns_server}
+    interfaces:
+      - deviceSelector:
+          busPath: "0*"
+        dhcp: false
+        addresses:
+          - ${ip_address}/24
+  time:
+    servers:
+      - ${ntp_server}
