@@ -1,8 +1,8 @@
 <div align="center">
 
-# Jamie's Common Terraform Talos Bootstrap
+# Jamie's Common OpenTofu Talos Bootstrap Module
 
-*A collection of Terraform templates to simplify talos linux deployment.*
+*A collection of OpenTofu templates to simplify Talos Linux deployment.*
 
 </div>
 
