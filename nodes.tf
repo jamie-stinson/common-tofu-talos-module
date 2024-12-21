@@ -1,11 +1,3 @@
-resource "random_string" "this" {
-  for_each = { for key, value in merge(var.talos.node_data.control_plane.nodes, var.talos.node_data.worker.nodes) : key => value }
-  length   = 8
-  lower    = true
-  numeric  = true
-  upper    = true
-  special  = false
-}
 
 data "talos_machine_configuration" "this" {
   for_each           = { for key, value in merge(var.talos.node_data.control_plane.nodes, var.talos.node_data.worker.nodes) : key => value }
@@ -30,11 +22,12 @@ resource "talos_machine_configuration_apply" "this" {
   config_patches              = flatten([
     [
       templatefile("${path.module}/templates/install.yaml.tmpl", {
-        hostname        = format("%s-%s", contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? "controlplane" : "worker", random_string.this[each.key].result)
-        dns_server      = var.talos.node_data.dns_endpoint
-        ip_address      = each.key
-        default_gateway = var.talos.node_data.default_gateway
-        ntp_server      = var.talos.node_data.ntp_endpoint
+        hostname             = format("%s-%s", contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? "controlplane" : "worker", var.node_hostnames[each.key])
+        primary_dns_server   = var.talos.node_data.primary_dns_server
+        secondary_dns_server = var.talos.node_data.secondary_dns_server
+        ip_address           = each.key
+        default_gateway      = var.talos.node_data.default_gateway
+        ntp_server           = var.talos.node_data.ntp_endpoint
       })
     ],
     # Add control plane only templates
