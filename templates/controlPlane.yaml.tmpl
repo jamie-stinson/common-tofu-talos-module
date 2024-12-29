@@ -1,0 +1,18 @@
+cluster:
+  proxy:
+    extraArgs:
+      metrics-bind-address: 0.0.0.0:10249
+  network:
+    cni:
+      name: flannel
+    dnsDomain: cluster.local
+    podSubnets:
+      - 10.244.0.0/16
+    serviceSubnets:
+      - 10.96.0.0/12
+  etcd:
+    advertisedSubnets:
+      - ${subnet}
+  apiServer:
+    certSANs:
+      - ${api_server}
