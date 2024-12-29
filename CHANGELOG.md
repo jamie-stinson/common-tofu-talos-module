@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/jamie-stinson/common-tofu-talos-module/compare/v0.2.0...v0.3.0) (2024-12-29)
+
+
+### Features
+
+* refactor ([#7](https://github.com/jamie-stinson/common-tofu-talos-module/issues/7)) ([b7414ca](https://github.com/jamie-stinson/common-tofu-talos-module/commit/b7414ca3fcf2693680426075dc03d654b02e80c7))
+
 ## [0.2.0](https://github.com/jamie-stinson/common-tofu-talos-module/compare/v0.1.0...v0.2.0) (2024-12-21)
 
 
