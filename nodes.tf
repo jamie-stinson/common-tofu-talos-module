@@ -47,6 +47,7 @@ resource "talos_machine_configuration_apply" "this" {
     [
       data.jinja_template.this[each.key].result
     ],
+    # Control Plane only templates
     contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? [
       templatefile("${path.module}/templates/controlPlane.yaml.tmpl", {
         api_server           = var.talos.cluster.api_server
