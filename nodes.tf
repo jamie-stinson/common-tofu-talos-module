@@ -21,7 +21,7 @@ data "jinja_template" "this" {
       ntp_server           = var.talos.node_data.ntp_endpoint
       api_server           = var.talos.cluster.api_server
       subnet               = var.talos.node_data.subnet
-      open_ebs             = var.talos.clus-ter.open_ebs
+      open_ebs             = var.talos.cluster.open_ebs
     })
     }
     source {
