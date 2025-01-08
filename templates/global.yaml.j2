@@ -1,0 +1,51 @@
+machine:
+  install:
+    diskSelector:
+      size: '> 25GB'
+    wipe: true
+    extraKernelArgs:
+      - console=ttyS1
+      - panic=10
+  systemDiskEncryption:
+    ephemeral:
+      provider: luks2
+      keys:
+        - nodeID: {}
+          slot: 0
+    state:
+      provider: luks2
+      keys:
+        - nodeID: {}
+          slot: 0
+  network:
+    hostname: "{{ hostname }}"
+    nameservers:
+      - "{{ primary_dns_server }}"
+      - "{{ secondary_dns_server }}"
+  time:
+    servers:
+      - "{{ ntp_server }}"
+  files:
+    - content: |
+        [metrics]
+          address = "0.0.0.0:11234"
+      path: /etc/cri/conf.d/20-customization.part
+      op: create
+  certSANs:
+    - "{{ api_server }}"
+  kubelet:
+    {% if open_ebs %}
+    extraMounts:
+      - destination: /var/openebs/local
+        type: bind
+        source: /var/openebs/local
+        options:
+          - rbind
+          - rshared
+          - rw
+    {% else %}
+    extraMounts: []      
+    {% endif %}
+    nodeIP:
+      validSubnets:
+        - "{{ subnet }}"

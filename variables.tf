@@ -11,6 +11,7 @@ variable "talos" {
       api_server         = string
       kubernetes_version = string
       talos_version      = string
+      open_ebs           = optional(bool, false)
     })
     node_data = object({
       disk_size            = string
