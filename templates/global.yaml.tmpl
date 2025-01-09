@@ -19,9 +19,13 @@ machine:
           slot: 0
   network:
     hostname: ${hostname}
+    %{~ if length(dns_servers) > 0 ~}
     nameservers:
-      - ${primary_dns_server}
-      - ${secondary_dns_server}
+    %{~ for endpoint in dns_servers ~}
+      - ${endpoint}
+    %{~ endfor ~}
+    %{~ else ~}
+    %{~ endif ~}
   time:
     servers:
       - ${ntp_server}

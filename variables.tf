@@ -17,8 +17,7 @@ variable "talos" {
       node_name            = string
       subnet               = string
       default_gateway      = string
-      primary_dns_server   = string
-      secondary_dns_server = string
+      dns_servers          = optional(list(string), [])
       ntp_endpoint         = string
       control_plane = object({
         cpu   = string

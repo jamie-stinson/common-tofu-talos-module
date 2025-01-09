@@ -23,11 +23,10 @@ resource "talos_machine_configuration_apply" "this" {
     [
       templatefile("${path.module}/templates/global.yaml.tmpl", {
         hostname             = format("%s-%s", contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? "controlplane" : "worker", var.node_hostnames[each.key])
-        primary_dns_server   = var.talos.node_data.primary_dns_server
-        secondary_dns_server = var.talos.node_data.secondary_dns_server
         ip_address           = each.key
         default_gateway      = var.talos.node_data.default_gateway
         ntp_server           = var.talos.node_data.ntp_endpoint
+        dns_servers          = var.talos.node_data.dns_servers
         api_server           = var.talos.cluster.api_server
         subnet               = var.talos.node_data.subnet
       })
