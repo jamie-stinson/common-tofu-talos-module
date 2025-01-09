@@ -19,7 +19,7 @@ variable "talos" {
       default_gateway      = string
       primary_dns_server   = string
       secondary_dns_server = string
-      ntp_endpoint         = string
+      ntp_servers          = optional(list(string), [])
       control_plane = object({
         cpu   = string
         memory = string

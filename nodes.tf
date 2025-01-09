@@ -27,7 +27,7 @@ resource "talos_machine_configuration_apply" "this" {
         secondary_dns_server = var.talos.node_data.secondary_dns_server
         ip_address           = each.key
         default_gateway      = var.talos.node_data.default_gateway
-        ntp_server           = var.talos.node_data.ntp_endpoint
+        ntp_servers          = var.talos.node_data.ntp_servers
         api_server           = var.talos.cluster.api_server
         subnet               = var.talos.node_data.subnet
       })

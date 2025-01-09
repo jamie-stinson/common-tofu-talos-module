@@ -23,8 +23,14 @@ machine:
       - ${primary_dns_server}
       - ${secondary_dns_server}
   time:
+    %{~ if length(ntp_servers) > 0 ~}
     servers:
-      - ${ntp_server}
+      %{~ for endpoint in ntp_servers ~}
+      - ${endpoint}
+      %{~ endfor ~}
+    %{~ else ~}
+    disabled: true
+    %{~ endif ~}
   files:
     - content: |
         [metrics]
@@ -37,6 +43,3 @@ machine:
     nodeIP:
       validSubnets:
         - ${subnet}
-
-
-
