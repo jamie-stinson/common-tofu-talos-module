@@ -46,11 +46,9 @@ machine:
         source: ${mount.source}
         %{~ if mount.options != null ~}
         options:
-          %{~ if length(mount.options) > 0 ~}
           %{~ for option in mount.options ~}
           - ${option}
           %{~ endfor ~}
-          %{~ endif ~}
         %{~ endif ~}
       %{~ endfor ~}
     %{~ else ~}
