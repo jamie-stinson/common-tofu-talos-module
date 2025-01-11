@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/jamie-stinson/common-tofu-talos-module/compare/v0.3.0...v0.4.0) (2025-01-11)
+
+
+### Features
+
+* **machine-config:** add kubelet extra mounts ([#12](https://github.com/jamie-stinson/common-tofu-talos-module/issues/12)) ([7b4d0ae](https://github.com/jamie-stinson/common-tofu-talos-module/commit/7b4d0aec67b7f589c3a10852875ee0b3f4fa3e10))
+
 ## [0.3.0](https://github.com/jamie-stinson/common-tofu-talos-module/compare/v0.2.0...v0.3.0) (2024-12-29)
 
 
