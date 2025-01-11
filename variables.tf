@@ -11,10 +11,10 @@ variable "talos" {
       api_server         = string
       kubernetes_version = string
       talos_version      = string
-      extra_mounts       = optional(map(object({
+      extra_mounts       = optional(list(object({
         path    = string
         type    = string
-        options = list(string)
+        options = optional(list(string))
         })))
     })
     node_data = object({

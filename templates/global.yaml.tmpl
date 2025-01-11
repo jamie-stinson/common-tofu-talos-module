@@ -45,9 +45,11 @@ machine:
         type: ${mount.type}
         source: ${mount.path}
         options:
+        %{~ if length(mount.options) > 0 ~}
         %{~ for option in mount.options ~}
           - ${option}
         %{~ endfor ~}
+        %{~ endif ~}
       %{~ endfor ~}
     %{~ else ~}
     %{~ endif ~}
