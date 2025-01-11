@@ -12,11 +12,11 @@ variable "talos" {
       kubernetes_version = string
       talos_version      = string
       extra_mounts       = optional(list(object({
-        dst_path  = string
-        src_path  = string
-        type      = string
-        options   = optional(list(string))
-        })))
+        destination   = string
+        source        = string
+        type          = string
+        options       = optional(list(string))
+      })))
     })
     node_data = object({
       disk_size            = string

@@ -41,9 +41,9 @@ machine:
     %{~ if length(extra_mounts) > 0 ~}
     extraMounts:
       %{~ for mount in extra_mounts ~}
-      - destination: ${mount.dst_path}
+      - destination: ${mount.destination}
         type: ${mount.type}
-        source: ${mount.src_path}
+        source: ${mount.source}
         %{~ if mount.options != null ~}
         options:
           %{~ if length(mount.options) > 0 ~}
