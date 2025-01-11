@@ -37,6 +37,17 @@ machine:
     nodeIP:
       validSubnets:
         - ${subnet}
-
-
-
+    %{~ if extra_mounts != null ~}
+    extraMounts:
+      %{~ for mount in extra_mounts ~}
+      - destination: ${mount.destination}
+        type: ${mount.type}
+        source: ${mount.source}
+        %{~ if mount.options != null ~}
+        options:
+          %{~ for option in mount.options ~}
+          - ${option}
+          %{~ endfor ~}
+        %{~ endif ~}
+      %{~ endfor ~}
+    %{~ endif ~}

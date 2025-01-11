@@ -30,6 +30,7 @@ resource "talos_machine_configuration_apply" "this" {
         ntp_server           = var.talos.node_data.ntp_endpoint
         api_server           = var.talos.cluster.api_server
         subnet               = var.talos.node_data.subnet
+        extra_mounts         = var.talos.cluster.extra_mounts
       })
     ],
     # Control Plane only templates
