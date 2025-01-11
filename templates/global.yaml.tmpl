@@ -37,6 +37,7 @@ machine:
     nodeIP:
       validSubnets:
         - ${subnet}
+    %{~ if extra_mounts != null ~}
     %{~ if length(extra_mounts) > 0 ~}
     extraMounts:
       %{~ for mount in extra_mounts ~}
@@ -49,4 +50,5 @@ machine:
         %{~ endfor ~}
       %{~ endfor ~}
     %{~ else ~}
+    %{~ endif ~}
     %{~ endif ~}
