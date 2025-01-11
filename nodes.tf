@@ -30,19 +30,7 @@ resource "talos_machine_configuration_apply" "this" {
         ntp_server           = var.talos.node_data.ntp_endpoint
         api_server           = var.talos.cluster.api_server
         subnet               = var.talos.node_data.subnet
-        extra_mounts         = length(coalesce(var.talos.cluster.extra_mounts, {})) > 0 ? join("\n", [
-  "    extraMounts:",
-  join("\n", [
-    for mount in var.talos.cluster.extra_mounts : 
-    join("\n", [
-      "      - destination: ${mount.path}",
-      "        type: ${mount.type}",
-      "        source: ${mount.path}",
-      "        options:",
-      join("\n", [for option in mount.options : "          - ${option}"])
-    ])
-  ])
-]) : ""
+        extra_mounts        =  var.talos.cluster.extra_mounts
       })
     ],
     # Control Plane only templates
