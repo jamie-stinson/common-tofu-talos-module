@@ -1,18 +1,25 @@
 cluster:
+  %{~ if kubernetes_metrics_server ~}
   proxy:
     extraArgs:
       metrics-bind-address: 0.0.0.0:10249
+  %{~ endif ~}
   network:
     cni:
-      name: flannel
+      name: ${cni}
     dnsDomain: cluster.local
+    %{~ if pod_subnets != null ~}
     podSubnets:
-      - 10.244.0.0/16
+      %{~ for subnet in pod_subnets ~}
+        - ${subnet}
+      %{~ endfor ~}
+    %{~ endif ~}
+    %{~ if service_subnets != null ~}
     serviceSubnets:
-      - 10.96.0.0/12
-  etcd:
-    advertisedSubnets:
-      - ${subnet}
+      %{~ for subnet in service_subnets ~}
+        - ${subnet}
+      %{~ endfor ~}
+    %{~ endif ~}
   apiServer:
     certSANs:
-      - ${api_server}
+      - ${api_server_endpoint}

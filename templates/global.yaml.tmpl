@@ -1,11 +1,14 @@
 machine:
   install:
-    diskSelector:
-      size: '> 25GB'
+    disk: ${install_disk}
+    extensions:
+      - image: ghcr.io/siderolabs/qemu-guest-agent:9.2.0
+      - image: ghcr.io/siderolabs/nvidia-open-gpu-kernel-modules-production:550.127.08-${talos_version}
     wipe: true
     extraKernelArgs:
         - console=ttyS1
         - panic=10
+  %{~ if encryption_type == "local" ~} 
   systemDiskEncryption:
     ephemeral:
       provider: luks2
@@ -17,27 +20,30 @@ machine:
       keys:
         - nodeID: {}
           slot: 0
+  %{~ endif ~}
   network:
     hostname: ${hostname}
     nameservers:
-      - ${primary_dns_server}
-      - ${secondary_dns_server}
+    %{~ for endpoint in dns_servers ~}
+      - ${endpoint}
+    %{~ endfor ~}
   time:
     servers:
-      - ${ntp_server}
+    %{~ for endpoint in ntp_servers ~}
+      - ${endpoint}
+    %{~ endfor ~}
+  %{~ if containerd_metrics_server ~}
   files:
     - content: |
         [metrics]
           address = "0.0.0.0:11234"        
       path: /etc/cri/conf.d/20-customization.part
       op: create
+  %{~ endif ~}
   certSANs:
-    - ${api_server}
+    - ${api_server_endpoint}
+  %{~ if extra_mounts != null ~}
   kubelet:
-    nodeIP:
-      validSubnets:
-        - ${subnet}
-    %{~ if extra_mounts != null ~}
     extraMounts:
       %{~ for mount in extra_mounts ~}
       - destination: ${mount.destination}
@@ -50,4 +56,4 @@ machine:
           %{~ endfor ~}
         %{~ endif ~}
       %{~ endfor ~}
-    %{~ endif ~}
+  %{~ endif ~}

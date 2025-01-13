@@ -1,46 +1,65 @@
 
 data "talos_machine_configuration" "this" {
-  for_each           = { for key, value in merge(var.talos.node_data.control_plane.nodes, var.talos.node_data.worker.nodes) : key => value }
+  for_each = {
+    for ip in concat(
+      var.talos.cluster.compute.control_plane.nodes,
+      var.talos.cluster.compute.worker.nodes
+    ) : ip => ip
+  }
   cluster_name       = var.talos.cluster.name
-  cluster_endpoint   = "https://${var.talos.cluster.api_server}:6443"
-  machine_type       = contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? "controlplane" : "worker"
+  cluster_endpoint   = "https://${var.talos.cluster.api_server_endpoint}:6443"
+  machine_type       = contains(var.talos.cluster.compute.control_plane.nodes, each.key) ? "controlplane" : "worker"
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   kubernetes_version = var.talos.cluster.kubernetes_version
   talos_version      = var.talos.cluster.talos_version
 }
 
 resource "talos_machine_configuration_apply" "this" {
-  for_each                    = { for key, value in merge(var.talos.node_data.control_plane.nodes, var.talos.node_data.worker.nodes) : key => value }
+  for_each = {
+    for ip in concat(
+      var.talos.cluster.compute.control_plane.nodes,
+      var.talos.cluster.compute.worker.nodes
+    ) : ip => ip
+  }
+
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.key].machine_configuration
   node                        = each.key
-  on_destroy                  = {
+
+  on_destroy = {
     graceful = true
     reboot   = false
     reset    = false
   }
-  config_patches              = flatten([
+
+  config_patches = flatten([
     [
       templatefile("${path.module}/templates/global.yaml.tmpl", {
-        hostname             = format("%s-%s", contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? "controlplane" : "worker", var.node_hostnames[each.key])
-        primary_dns_server   = var.talos.node_data.primary_dns_server
-        secondary_dns_server = var.talos.node_data.secondary_dns_server
-        ip_address           = each.key
-        default_gateway      = var.talos.node_data.default_gateway
-        ntp_server           = var.talos.node_data.ntp_endpoint
-        api_server           = var.talos.cluster.api_server
-        subnet               = var.talos.node_data.subnet
-        extra_mounts         = var.talos.cluster.extra_mounts
+        hostname = format(
+          "%s-%s",
+          contains(var.talos.cluster.compute.control_plane.nodes, each.key) ? "controlplane" : "worker",
+          var.node_hostnames[each.key]
+        )
+        api_server_endpoint       = var.talos.cluster.api_server_endpoint
+        dns_servers               = var.talos.cluster.networking.dns_servers
+        ntp_servers               = var.talos.cluster.networking.ntp_servers
+        containerd_metrics_server = var.talos.cluster.monitoring.containerd_metrics_server
+        install_disk              = var.talos.cluster.storage.install_disk
+        encryption_type           = var.talos.cluster.storage.encryption_type
+        extra_mounts              = var.talos.cluster.storage.extra_kubelet_mounts
+        talos_version             = var.talos.cluster.talos_version
       })
     ],
-    # Control Plane only templates
-    contains(keys(var.talos.node_data.control_plane.nodes), each.key) ? [
+    # Control Plane specific templates
+    contains(var.talos.cluster.compute.control_plane.nodes, each.key) ? [
       templatefile("${path.module}/templates/controlPlane.yaml.tmpl", {
-        api_server           = var.talos.cluster.api_server
-        subnet               = var.talos.node_data.subnet
+        api_server_endpoint       = var.talos.cluster.api_server_endpoint
+        cni                       = var.talos.cluster.networking.cni
+        pod_subnets               = var.talos.cluster.networking.pod_subnets
+        service_subnets           = var.talos.cluster.networking.service_subnets
+        kubernetes_metrics_server = var.talos.cluster.monitoring.kubernetes_metrics_server
       }),
-      templatefile("${path.module}/templates/podSecurityConfiguration.yaml.tmpl", {
-      })
+      templatefile("${path.module}/templates/podSecurityConfiguration.yaml.tmpl", {})
     ] : []
   ])
 }
