@@ -1,14 +1,14 @@
-
 data "talos_machine_configuration" "this" {
   for_each = {
-    for ip in concat(
+    for ip, node in merge(
       var.talos.cluster.compute.control_plane.nodes,
       var.talos.cluster.compute.worker.nodes
-    ) : ip => ip
+    ) : ip => node
   }
+
   cluster_name       = var.talos.cluster.name
   cluster_endpoint   = "https://${var.talos.cluster.api_server_endpoint}:6443"
-  machine_type       = contains(var.talos.cluster.compute.control_plane.nodes, each.key) ? "controlplane" : "worker"
+  machine_type       = contains(keys(var.talos.cluster.compute.control_plane.nodes), each.key) ? "controlplane" : "worker"
   machine_secrets    = talos_machine_secrets.this.machine_secrets
   kubernetes_version = var.talos.cluster.kubernetes_version
   talos_version      = var.talos.cluster.talos_version
@@ -16,10 +16,10 @@ data "talos_machine_configuration" "this" {
 
 resource "talos_machine_configuration_apply" "this" {
   for_each = {
-    for ip in concat(
+    for ip, node in merge(
       var.talos.cluster.compute.control_plane.nodes,
       var.talos.cluster.compute.worker.nodes
-    ) : ip => ip
+    ) : ip => node
   }
 
   client_configuration        = talos_machine_secrets.this.client_configuration
@@ -34,13 +34,15 @@ resource "talos_machine_configuration_apply" "this" {
 
   config_patches = flatten([
     [
+    # Control Plane & Worker Template
       templatefile("${path.module}/templates/global.yaml.tmpl", {
         hostname = format(
           "%s-%s",
-          contains(var.talos.cluster.compute.control_plane.nodes, each.key) ? "controlplane" : "worker",
+          contains(keys(var.talos.cluster.compute.control_plane.nodes), each.key) ? "controlplane" : "worker",
           var.node_hostnames[each.key]
         )
         api_server_endpoint       = var.talos.cluster.api_server_endpoint
+        extensions                = var.talos.cluster.extensions
         dns_servers               = var.talos.cluster.networking.dns_servers
         ntp_servers               = var.talos.cluster.networking.ntp_servers
         containerd_metrics_server = var.talos.cluster.monitoring.containerd_metrics_server
@@ -50,8 +52,8 @@ resource "talos_machine_configuration_apply" "this" {
         talos_version             = var.talos.cluster.talos_version
       })
     ],
-    # Control Plane specific templates
-    contains(var.talos.cluster.compute.control_plane.nodes, each.key) ? [
+    # Control Plane Template
+    contains(keys(var.talos.cluster.compute.control_plane.nodes), each.key) ? [
       templatefile("${path.module}/templates/controlPlane.yaml.tmpl", {
         api_server_endpoint       = var.talos.cluster.api_server_endpoint
         cni                       = var.talos.cluster.networking.cni
@@ -59,6 +61,7 @@ resource "talos_machine_configuration_apply" "this" {
         service_subnets           = var.talos.cluster.networking.service_subnets
         kubernetes_metrics_server = var.talos.cluster.monitoring.kubernetes_metrics_server
       }),
+    # Disable Pod Security Admission
       templatefile("${path.module}/templates/podSecurityConfiguration.yaml.tmpl", {})
     ] : []
   ])
