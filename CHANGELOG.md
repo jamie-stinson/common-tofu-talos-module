@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/jamie-stinson/common-tofu-talos-module/compare/v0.5.0...v0.6.0) (2025-01-17)
+
+
+### Features
+
+* add support for multiple proxmox nodes ([#16](https://github.com/jamie-stinson/common-tofu-talos-module/issues/16)) ([8dc0328](https://github.com/jamie-stinson/common-tofu-talos-module/commit/8dc0328d36e3a1cfafe29aab2784c0315bdb48f0))
+
 ## [0.5.0](https://github.com/jamie-stinson/common-tofu-talos-module/compare/v0.4.0...v0.5.0) (2025-01-13)
 
 
